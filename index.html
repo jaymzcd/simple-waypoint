@@ -8,7 +8,7 @@
         body {
             font-family:'Walter Turncoat';
         }
-        #map, #points {
+        #map, #points-list {
             float:left;
             margin:10px;
         }
@@ -51,6 +51,11 @@
             map.addOverlay(start);
             $('#points').append('<p>['+waypoints.length+']'+'('+latlng.lat()+', '+latlng.lng()+')</p>');
         }
+        function clearAll() {
+            waypoints = [];
+            map.clearOverlays();
+            $('#points').html('');
+        }
     </script>
 </head>
 <body>
@@ -60,13 +65,17 @@
     <h2>Center me!</h2>
     <input type="text" value="N1 6NU" id="location">
     <button id="locate">Locate</button>
+    <button id="reset">Reset</button>
 </div>
-<div id="points">
+<div id="points-list">
     <h2>Waypoints</h2>
+    <div id="points">
+    </div>
 </div>
 <script type="text/javascript">
     $(document).ready(function() {
         initialize();
+        $('#reset').click(clearAll);
         $('#locate').click(function() {
             var target = $('#location').val();
             console.log('looking up: '+target);
