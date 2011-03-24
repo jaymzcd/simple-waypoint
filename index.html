@@ -42,23 +42,22 @@
             }
         }
         function addWaypoint(overlay, latlng, overlaylatlng) {
-            //var marker = new GMarker(new GPoint(latlng.lng(), latlng.lat()));
-            //map.addOverlay(marker);
             map.clearOverlays();
             var wp = new GPoint(latlng.lng(), latlng.lat());
             waypoints.push(wp);
-            if(waypoints.length==1) {
-                start = new GMarker(wp);
-            }
-            polyline = new GPolyline(waypoints, "#0000ff", 3);
-            map.addOverlay(polyline);
-            map.addOverlay(start);
+            drawPath();
             $('#points').append('<li>['+waypoints.length+']'+'('+latlng.lat()+', '+latlng.lng()+')</li>');
         }
         function clearAll() {
             waypoints = [];
             map.clearOverlays();
             $('#points').html('');
+        }
+        function drawPath() {
+            var start = new GMarker(waypoints[0]);
+            map.addOverlay(start);
+            polyline = new GPolyline(waypoints, "#0000ff", 3);
+            map.addOverlay(polyline);
         }
     </script>
 </head>
@@ -87,8 +86,12 @@
                 map.setCenter(point, 16);
             });
         });
-        $('#points li').click(function() {
-            console.log('clicked');
+        $('#points li').live('click', function() {
+            var idx = $(this).index();
+            map.clearOverlays();
+            $(this).fadeOut('slow');
+            waypoints.splice(idx-1, 1);
+            drawPath();
         });
     });
 </script>
