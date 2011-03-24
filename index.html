@@ -14,7 +14,7 @@
         function initialize() {
             if (GBrowserIsCompatible()) {
                 map = new GMap2(document.getElementById("map"));
-                map.setCenter(new GLatLng(37.4419, -122.1419), 13);
+                map.setCenter(new GLatLng(51.52, -0.08), 16);
                 map.setUIToDefault();
                 GEvent.addListener(map, 'click', addWaypoint);
             }
@@ -23,12 +23,13 @@
             //var marker = new GMarker(new GPoint(latlng.lng(), latlng.lat()));
             //map.addOverlay(marker);
             waypoints.push(new GPoint(latlng.lng(), latlng.lat()));
-            polyline = new GPolyline(waypoints, "#ff69b4", 3);
+            polyline = new GPolyline(waypoints, "#0000ff", 3);
             map.addOverlay(polyline);
         }
     </script>
 </head>
 <body>
+<h1>Canoe Inc Map waypoint - testing</h1>
 <div id="map" style="width: 800px; height: 600px"></div>
 <input type="text" value="N1 6NU" id="location">
 <button id="locate">Locate</button>
@@ -39,7 +40,7 @@
             var target = $('#location').val();
             console.log('looking up: '+target);
             geocoder.getLatLng(target, function(point) {
-                map.setCenter(point, 15);
+                map.setCenter(point, 16);
             });
         });
     });
