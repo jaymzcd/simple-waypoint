@@ -48,6 +48,11 @@
             console.log("Added new waypoint ("+waypoints.length+")");
             drawPath();
             $('#points').append('<li>['+waypoints.length+']'+'('+latlng.lat()+', '+latlng.lng()+')</li>');
+            
+            // Should cache the point instead of this
+            var oldPoint = waypoints[waypoints.length-1];
+            var oldLatLng = map.fromDivPixelToLatLng(oldPoint);
+            console.log("Distance to new point: "+oldLatLng.distanceFrom(latlng)/1000); // in km
         }
         function clearAll() {
             waypoints = [];
