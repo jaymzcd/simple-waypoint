@@ -3,6 +3,23 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     <title></title>
+    <link href='http://fonts.googleapis.com/css?family=Walter+Turncoat' rel='stylesheet' type='text/css'>
+    <style type="text/css">
+        body {
+            font-family:'Walter Turncoat';
+        }
+        #map, #points {
+            float:left;
+            margin:10px;
+        }
+        #points {
+            width:200px;
+            font-size:11px;
+        }
+        #target {
+            float:left;
+        }
+    </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
     <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=ABQIAAAAWi-BMy_-pIul3fJ_Wtb0cRT3I7pH2kvG1cR-tJYe6MY47rYQkhSW5GtCSMu1hzYQV-I51AbntfO0SA" type="text/javascript"></script>
     <script type="text/javascript">
@@ -25,14 +42,21 @@
             waypoints.push(new GPoint(latlng.lng(), latlng.lat()));
             polyline = new GPolyline(waypoints, "#0000ff", 3);
             map.addOverlay(polyline);
+            $('#points').append('<p>['+waypoints.length+']'+'('+latlng.lat()+', '+latlng.lng()+')</p>');
         }
     </script>
 </head>
 <body>
 <h1>Canoe Inc Map waypoint - testing</h1>
 <div id="map" style="width: 800px; height: 600px"></div>
-<input type="text" value="N1 6NU" id="location">
-<button id="locate">Locate</button>
+<div id="target">
+    <h2>Center me!</h2>
+    <input type="text" value="N1 6NU" id="location">
+    <button id="locate">Locate</button>
+</div>
+<div id="points">
+    <h2>Waypoints</h2>
+</div>
 <script type="text/javascript">
     $(document).ready(function() {
         initialize();
