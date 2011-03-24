@@ -45,6 +45,7 @@
             map.clearOverlays();
             var wp = new GPoint(latlng.lng(), latlng.lat());
             waypoints.push(wp);
+            console.log("Added new waypoint ("+waypoints.length+")");
             drawPath();
             $('#points').append('<li>['+waypoints.length+']'+'('+latlng.lat()+', '+latlng.lng()+')</li>');
         }
@@ -88,10 +89,10 @@
         });
         $('#points li').live('click', function() {
             var idx = $(this).index();
+            $(this).fadeOut().remove();            
             map.clearOverlays();
-            $(this).fadeOut('slow');
-            waypoints.splice(idx-1, 1);
-            drawPath();
+            waypoints.splice(idx, 1);drawPath();
+            console.log("index to remove was "+idx+", length is now "+waypoints.length);
         });
     });
 </script>
