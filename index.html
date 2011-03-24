@@ -27,6 +27,7 @@
         var waypoints = new Array();
         var polyline;
         var geocoder = new GClientGeocoder();
+        var start;
 
         function initialize() {
             if (GBrowserIsCompatible()) {
@@ -39,9 +40,15 @@
         function addWaypoint(overlay, latlng, overlaylatlng) {
             //var marker = new GMarker(new GPoint(latlng.lng(), latlng.lat()));
             //map.addOverlay(marker);
-            waypoints.push(new GPoint(latlng.lng(), latlng.lat()));
+            map.clearOverlays();
+            var wp = new GPoint(latlng.lng(), latlng.lat());
+            waypoints.push(wp);
+            if(waypoints.length==1) {
+                start = new GMarker(wp);
+            }
             polyline = new GPolyline(waypoints, "#0000ff", 3);
             map.addOverlay(polyline);
+            map.addOverlay(start);
             $('#points').append('<p>['+waypoints.length+']'+'('+latlng.lat()+', '+latlng.lng()+')</p>');
         }
     </script>
