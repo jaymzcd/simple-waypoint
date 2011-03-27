@@ -29,9 +29,11 @@
     <script type="text/javascript">
         var map;
         var waypoints = new Array();
+        var routes = new Array();
         var polyline;
         var geocoder = new GClientGeocoder();
         var start;
+        var activeRoute = 0;
 
         function initialize() {
             if (GBrowserIsCompatible()) {
@@ -39,10 +41,12 @@
                 map.setCenter(new GLatLng(51.52, -0.08), 16);
                 map.setUIToDefault();
                 GEvent.addListener(map, 'click', addWaypoint);
+                routes[activeRoute] = new Array();
             }
         }
         function addWaypoint(overlay, latlng, overlaylatlng) {
             map.clearOverlays();
+            waypoints = routes[activeRoute];
             var wp = new GPoint(latlng.lng(), latlng.lat());
             waypoints.push(wp);
             console.log("Added new waypoint ("+waypoints.length+")");
@@ -51,19 +55,26 @@
             
             // Should cache the point instead of this
             var oldPoint = waypoints[waypoints.length-1];
-            var oldLatLng = map.fromDivPixelToLatLng(oldPoint);
+            var oldLatLng = map.fromContainerPixelToLatLng(oldPoint);
             console.log("Distance to new point: "+oldLatLng.distanceFrom(latlng)/1000); // in km
+            
+            routes[activeRoute] = waypoints;
         }
         function clearAll() {
             waypoints = [];
+            routes = [];
             map.clearOverlays();
             $('#points').html('');
         }
         function drawPath() {
-            var start = new GMarker(waypoints[0]);
-            map.addOverlay(start);
-            polyline = new GPolyline(waypoints, "#0000ff", 3);
-            map.addOverlay(polyline);
+            for(var x=0; x<routes.length; x++) {
+                var start = new GMarker(routes[x][0]);
+                map.addOverlay(start);
+                waypoints = routes[x];
+                polyline = new GPolyline(waypoints, "#0000ff", 3);
+                console.log("Drawing route "+x);            
+                map.addOverlay(polyline);
+            }
         }
     </script>
 </head>
@@ -74,6 +85,7 @@
     <h2>Center me!</h2>
     <input type="text" value="N1 6NU" id="location">
     <button id="locate">Locate</button>
+    <button id="newRoute">new route</button>
     <button id="reset">Reset</button>
 </div>
 <div id="points-list">
@@ -96,8 +108,14 @@
             var idx = $(this).index();
             $(this).fadeOut().remove();            
             map.clearOverlays();
-            waypoints.splice(idx, 1);drawPath();
+            waypoints.splice(idx, 1);
+            drawPath();
             console.log("index to remove was "+idx+", length is now "+waypoints.length);
+        });
+        $('#newRoute').click(function () {
+            activeRoute++;
+            routes[activeRoute] = new Array();
+            console.log("Active route now "+activeRoute);
         });
     });
 </script>
