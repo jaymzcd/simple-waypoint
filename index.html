@@ -36,9 +36,9 @@
     <script type="text/javascript">
         var map;
         var waypoints = new Array();
+        var markers = new Array();
         var routes = new Array();
         var colors = new Array();
-        var polyline;
         var geocoder = new GClientGeocoder();
         var start;
         var activeRoute = 0;
@@ -56,8 +56,16 @@
         }
         function addWaypoint(overlay, latlng, overlaylatlng) {
             waypoints = routes[activeRoute];
+            
             var wp = new GPoint(latlng.lng(), latlng.lat());
             waypoints.push(wp);
+            
+            var marker = new GMarker(wp, {draggable: true});
+            markers.push(marker);
+            
+            //GEvent.addListener(marker, "mouseover", handleMarker);
+            GEvent.addListener(marker, "dragend", handleMarkerDragEnd);
+            
             console.log("Added new waypoint ("+waypoints.length+")");
             drawPath();
             $('.points').append('<li>['+waypoints.length+']'+'('+latlng.lat()+', '+latlng.lng()+')</li>');
@@ -65,11 +73,12 @@
             // Should cache the point instead of this
             var oldPoint = waypoints[waypoints.length-1];
             var oldLatLng = map.fromContainerPixelToLatLng(oldPoint);
-            console.log("Distance to new point: "+oldLatLng.distanceFrom(latlng)/1000); // in km            
+            //console.log("Distance to new point: "+oldLatLng.distanceFrom(latlng)/1000); // in km            
             routes[activeRoute] = waypoints;
         }
         function clearAll() {
             waypoints = [];
+            markers = new Array();
             routes = [];
             activeRoute = 0;
             routes[activeRoute] = new Array();
@@ -80,15 +89,16 @@
             map.clearOverlays();
             for(var x=0; x<routes.length; x++) {
                 waypoints = routes[x];
-                polyline = new GPolyline(waypoints, colors[x], 3);
+                var polyline = new GPolyline(waypoints, colors[x], 3);
                 console.log("Drawing route "+x);            
                 map.addOverlay(polyline);
                 var routeLength = (routes[x].length);
-                for(var y=0; y<routeLength; y++) {
-                    if(!hidePoints) {
-                        var wp = new GMarker(routes[x][y], {draggable: true});
-                        map.addOverlay(wp);
-                        GEvent.addListener(wp, "mouseover", handleMarker);
+                
+                if(x==activeRoute) {
+                    for(var y=0; y<routeLength; y++) {
+                        if(!hidePoints) {
+                            map.addOverlay(markers[y]);
+                        }
                     }
                 }
             }
@@ -96,6 +106,13 @@
         
         function handleMarker() {
             this.openInfoWindowHtml();
+        }
+        
+        function handleMarkerDragEnd() {
+            var index = markers.indexOf(this);
+            waypoints[index] = new GPoint(this.getLatLng().lng(), this.getLatLng().lat());
+            console.log("Dropped pin #"+index);
+            drawPath();
         }
     </script>
 </head>
@@ -133,6 +150,7 @@
             var idx = $(this).index();
             $(this).fadeOut().remove();            
             waypoints.splice(idx, 1);
+            markers.splice(idx, 1);
             drawPath();
             console.log("index to remove was "+idx+", length is now "+waypoints.length);
         });
@@ -140,6 +158,7 @@
             activeRoute++;
             $('.points').html('');
             routes[activeRoute] = new Array();
+            markers = new Array();
             colors[activeRoute] = $('#color').val();
             console.log("Active route now "+activeRoute);
         });
