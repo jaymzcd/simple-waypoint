@@ -12,9 +12,10 @@
             float:left;
             margin:10px;
         }
-        #points {
+        .points {
             width:200px;
             font-size:11px;
+            float:left;
         }
         #target {
             float:left;
@@ -23,6 +24,12 @@
             background: #f69999;
             cursor: pointer;
         }
+        h1 { 
+            clear:both;
+        }
+        #target input {
+            float:left;        
+        }
     </style>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
     <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=ABQIAAAAWi-BMy_-pIul3fJ_Wtb0cRT3I7pH2kvG1cR-tJYe6MY47rYQkhSW5GtCSMu1hzYQV-I51AbntfO0SA" type="text/javascript"></script>
@@ -30,6 +37,7 @@
         var map;
         var waypoints = new Array();
         var routes = new Array();
+        var colors = new Array();
         var polyline;
         var geocoder = new GClientGeocoder();
         var start;
@@ -42,6 +50,7 @@
                 map.setUIToDefault();
                 GEvent.addListener(map, 'click', addWaypoint);
                 routes[activeRoute] = new Array();
+                colors[activeRoute] = $('#color').val();
             }
         }
         function addWaypoint(overlay, latlng, overlaylatlng) {
@@ -51,7 +60,7 @@
             waypoints.push(wp);
             console.log("Added new waypoint ("+waypoints.length+")");
             drawPath();
-            $('#points').append('<li>['+waypoints.length+']'+'('+latlng.lat()+', '+latlng.lng()+')</li>');
+            $('.points').append('<li>['+waypoints.length+']'+'('+latlng.lat()+', '+latlng.lng()+')</li>');
             
             // Should cache the point instead of this
             var oldPoint = waypoints[waypoints.length-1];
@@ -63,36 +72,42 @@
         function clearAll() {
             waypoints = [];
             routes = [];
+            activeRoute = 0;
+            routes[activeRoute] = new Array();
             map.clearOverlays();
-            $('#points').html('');
+            $('.points').html('');
         }
         function drawPath() {
             for(var x=0; x<routes.length; x++) {
                 var start = new GMarker(routes[x][0]);
                 map.addOverlay(start);
                 waypoints = routes[x];
-                polyline = new GPolyline(waypoints, "#0000ff", 3);
+                polyline = new GPolyline(waypoints, colors[x], 3);
                 console.log("Drawing route "+x);            
                 map.addOverlay(polyline);
+                var routeLength = (routes[x].length);
+                var end = new GMarker(routes[x][routeLength-1]);
+                map.addOverlay(end);
             }
         }
     </script>
 </head>
 <body>
-<h1>Simple Map waypoint - testing</h1>
 <div id="map" style="width: 800px; height: 600px"></div>
 <div id="target">
     <h2>Center me!</h2>
     <input type="text" value="N1 6NU" id="location">
+    <input type="text" value="ff2200" id="color">
     <button id="locate">Locate</button>
     <button id="newRoute">new route</button>
     <button id="reset">Reset</button>
 </div>
 <div id="points-list">
     <h2>Waypoints</h2>
-    <ul id="points">
+    <ul class="points">
     </ul>
 </div>
+<h1>Simple Map waypoint - testing</h1>
 <script type="text/javascript">
     $(document).ready(function() {
         initialize();
@@ -115,6 +130,7 @@
         $('#newRoute').click(function () {
             activeRoute++;
             routes[activeRoute] = new Array();
+            colors[activeRoute] = $('#color').val();
             console.log("Active route now "+activeRoute);
         });
     });
