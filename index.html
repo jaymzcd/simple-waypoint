@@ -130,6 +130,10 @@
         function clickRoute(e) {
             console.log("Route clicked");
         }
+        
+        function waypointData() {
+        
+        }
     </script>
 </head>
 <body>
@@ -141,6 +145,7 @@
     <button id="locate">Locate</button>
     <button id="newRoute">new route</button>
     <button id="reset">Reset</button>
+    <button id="dataInOut">Export/Import</button>
     
     <input type="checkbox" id="hidePoints" />
     <label for="hidePoints">Hide points</label>
@@ -151,6 +156,8 @@
     </ul>
 </div>
 <h1>Simple Map waypoint - testing</h1>
+<textarea id="jsonOut"></textarea>
+
 <script type="text/javascript">
     $(document).ready(function() {
         initialize();
@@ -181,6 +188,9 @@
         $('#hidePoints').click(function() {
             hidePoints = !hidePoints;
             drawPath();
+        });
+        $('#dataInOut').click(function() {
+            $('#jsonOut').html(waypointData());
         });
     });
 </script>
