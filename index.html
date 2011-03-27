@@ -27,7 +27,7 @@
         h1 { 
             clear:both;
         }
-        #target input {
+        #target input[type="text"] {
             float:left;        
         }
     </style>
@@ -42,6 +42,7 @@
         var geocoder = new GClientGeocoder();
         var start;
         var activeRoute = 0;
+        var hidePoints = false;
 
         function initialize() {
             if (GBrowserIsCompatible()) {
@@ -54,19 +55,17 @@
             }
         }
         function addWaypoint(overlay, latlng, overlaylatlng) {
-            map.clearOverlays();
             waypoints = routes[activeRoute];
             var wp = new GPoint(latlng.lng(), latlng.lat());
             waypoints.push(wp);
             console.log("Added new waypoint ("+waypoints.length+")");
             drawPath();
             $('.points').append('<li>['+waypoints.length+']'+'('+latlng.lat()+', '+latlng.lng()+')</li>');
-            
+          
             // Should cache the point instead of this
             var oldPoint = waypoints[waypoints.length-1];
             var oldLatLng = map.fromContainerPixelToLatLng(oldPoint);
-            console.log("Distance to new point: "+oldLatLng.distanceFrom(latlng)/1000); // in km
-            
+            console.log("Distance to new point: "+oldLatLng.distanceFrom(latlng)/1000); // in km            
             routes[activeRoute] = waypoints;
         }
         function clearAll() {
@@ -78,17 +77,25 @@
             $('.points').html('');
         }
         function drawPath() {
+            map.clearOverlays();
             for(var x=0; x<routes.length; x++) {
-                var start = new GMarker(routes[x][0]);
-                map.addOverlay(start);
                 waypoints = routes[x];
                 polyline = new GPolyline(waypoints, colors[x], 3);
                 console.log("Drawing route "+x);            
                 map.addOverlay(polyline);
                 var routeLength = (routes[x].length);
-                var end = new GMarker(routes[x][routeLength-1]);
-                map.addOverlay(end);
+                for(var y=0; y<routeLength; y++) {
+                    if(!hidePoints) {
+                        var wp = new GMarker(routes[x][y], {draggable: true});
+                        map.addOverlay(wp);
+                        GEvent.addListener(wp, "mouseover", handleMarker);
+                    }
+                }
             }
+        }
+        
+        function handleMarker() {
+            this.openInfoWindowHtml();
         }
     </script>
 </head>
@@ -97,10 +104,13 @@
 <div id="target">
     <h2>Center me!</h2>
     <input type="text" value="N1 6NU" id="location">
-    <input type="text" value="ff2200" id="color">
+    <input type="text" value="0000ff" id="color">
     <button id="locate">Locate</button>
     <button id="newRoute">new route</button>
     <button id="reset">Reset</button>
+    
+    <input type="checkbox" id="hidePoints" />
+    <label for="hidePoints">Hide points</label>
 </div>
 <div id="points-list">
     <h2>Waypoints</h2>
@@ -119,19 +129,23 @@
                 map.setCenter(point, 16);
             });
         });
-        $('#points li').live('click', function() {
+        $('.points li').live('click', function() {
             var idx = $(this).index();
             $(this).fadeOut().remove();            
-            map.clearOverlays();
             waypoints.splice(idx, 1);
             drawPath();
             console.log("index to remove was "+idx+", length is now "+waypoints.length);
         });
         $('#newRoute').click(function () {
             activeRoute++;
+            $('.points').html('');
             routes[activeRoute] = new Array();
             colors[activeRoute] = $('#color').val();
             console.log("Active route now "+activeRoute);
+        });
+        $('#hidePoints').click(function() {
+            hidePoints = !hidePoints;
+            drawPath();
         });
     });
 </script>
