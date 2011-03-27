@@ -34,6 +34,18 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
     <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=ABQIAAAAWi-BMy_-pIul3fJ_Wtb0cRT3I7pH2kvG1cR-tJYe6MY47rYQkhSW5GtCSMu1hzYQV-I51AbntfO0SA" type="text/javascript"></script>
     <script type="text/javascript">
+        /* TODOS:
+            * Should change polyline/markers to store them in arrays, refactor
+            the various collections here so it's not as wasteful
+            
+            * Add some sort of behavior to allow selecting a route for editing
+            and marker display
+            
+            * Allow inserting at a position in the array for points rather than
+            always at the end 
+            
+        */
+    
         var map;
         var waypoints = new Array();
         var markers = new Array();
@@ -90,7 +102,7 @@
             for(var x=0; x<routes.length; x++) {
                 waypoints = routes[x];
                 var polyline = new GPolyline(waypoints, colors[x], 3);
-                console.log("Drawing route "+x);            
+                GEvent.addListener(polyline, "click", clickRoute);
                 map.addOverlay(polyline);
                 var routeLength = (routes[x].length);
                 
@@ -113,6 +125,10 @@
             waypoints[index] = new GPoint(this.getLatLng().lng(), this.getLatLng().lat());
             console.log("Dropped pin #"+index);
             drawPath();
+        }
+        
+        function clickRoute(e) {
+            console.log("Route clicked");
         }
     </script>
 </head>
