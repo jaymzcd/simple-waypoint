@@ -1,1 +1,25 @@
-* { margin:0; padding: 0; }
+body {
+    font-family:'Walter Turncoat';
+}
+#map, #points-list {
+    float:left;
+    margin:10px;
+}
+.points {
+    width:200px;
+    font-size:11px;
+    float:left;
+}
+#target {
+    float:left;
+}
+li:hover {
+    background: #f69999;
+    cursor: pointer;
+}
+h1 { 
+    clear:both;
+}
+#target input[type="text"] {
+    float:left;        
+}
